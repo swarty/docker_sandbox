@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  # should starts before api
+  api_db:
+    container_name: docker-api-db
+    image: mongo:latest
+    volumes:
+      - mongodb_api:/data/db
+
+  api:
+    build: ./api
+    container_name: docker-api
+    command: npm run start
+    restart: unless-stopped
+    ports:
+      # left number - our machine port,
+      # right number - our docker container port
+      - "3001:3001"
+    environment:
+      # variables should be provided without any spaces!!!
+      # env values that can be ported to js files and be accessible via 'process.env .... '
+      - PORT=3001
+      - HOST=http://test-docker.com
+      # api_db ... host of our aservice, should have same name that has our service for db
+      - MONGO_URL=mongodb://api_db:27017/api
+    depends_on:
+      # express what should this service wait before starts, first will be inited api_db
+      - api_db
+
+  auth_db:
+    image: mongo:latest
+    container_name: docker-auth-db
+    volumes:
+      - mongodb_auth:/data/db
+
+  auth:
+    build: ./auth
+    container_name: docker-auth
+    command: npm run start
+    restart: unless-stopped
+    ports: 
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - HOST=http://test-docker.com
+      - MONGO_URL=mongodb://auth_db:27017/auth
+    depends_on:
+      - auth_db
+
+  frontend:
+    build: ./frontend
+    container_name: docker-frontend
+    command: npm run start
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    # interactive console enable
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend/src:/usr/src/app/src
+
+volumes:
+  mongodb_api:
+  mongodb_auth:
