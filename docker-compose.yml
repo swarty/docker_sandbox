@@ -27,6 +27,8 @@ services:
     depends_on:
       # express what should this service wait before starts, first will be inited api_db
       - api_db
+    volumes:
+      - ./api/src:/usr/src/app/src
 
   auth_db:
     image: mongo:latest
