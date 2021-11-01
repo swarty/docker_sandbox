@@ -1,11 +1,13 @@
 // libs
 import express from 'express';
+import axios from 'axios';
 
 // config
 import {
   PORT,
   HOST,
   DB,
+  AUTH_API_URL,
 } from './config.js';
 
 // functions
@@ -39,7 +41,22 @@ const startServer = () => {
 }
 
 app.get('/test', (req, res) => {
-  res.send('Our api server is working correctly');
+  res.send('Our api server is working correctly ');
+});
+
+
+app.get('/testWithCurrentUser', (req, res) => {
+  // AUTH_API_URL
+  console.log('test');
+
+  axios
+    .get(AUTH_API_URL + '/currentUser')
+    .then(({ data }) => {
+      res.json({
+        restWithCurrentUser: true,
+        currentUserFromAuth: data,
+      });
+    });
 });
 
 connectDb()

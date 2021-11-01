@@ -13,6 +13,10 @@ RUN npm install
 # then copy all files from our folder without node_modules folder (because we will delete it folder)
 COPY . .
 
+RUN npm run build
+
+RUN npm install -g serve
+
 # upd: migrated two commands below to docker-compose file
 # give your container settings to listen some port
 # EXPOSE 8080
